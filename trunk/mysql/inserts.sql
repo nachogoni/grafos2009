@@ -1,0 +1,1 @@
+INSERT INTO amigos VALUES(NULL, 'aa');
