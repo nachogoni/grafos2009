@@ -10,6 +10,7 @@ public class OrderFactoryImpl implements OrderFactory {
 
 	private final NeoService neo;
 	private final Node orderFactoryNode;
+	private final String KEY_NAME = "name";
 
 	public OrderFactoryImpl(NeoService neo) {
 
@@ -20,6 +21,7 @@ public class OrderFactoryImpl implements OrderFactory {
 
 		if (rel == null) {
 			orderFactoryNode = neo.createNode();
+			orderFactoryNode.setProperty(KEY_NAME, "Orders");
 			neo.getReferenceNode().createRelationshipTo(orderFactoryNode,
 					RelationshipTypes.ORDERS);
 		} else {

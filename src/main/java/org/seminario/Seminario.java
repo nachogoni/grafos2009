@@ -78,7 +78,7 @@ public class Seminario {
 			anOrder.setSalesman(aSalesman);
 
 			// Orders will have 0-3 items
-			for (int i = 0; i < r.nextInt(3); i++) {
+			for (int i = 0; i < 1+r.nextInt(3); i++) {
 				// Item is created and added.
 				anItem = itemFactory.createItem();
 				anItem.setName(movieNames[r.nextInt(movieNames.length)]);
