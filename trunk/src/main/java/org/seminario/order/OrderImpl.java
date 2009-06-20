@@ -13,14 +13,18 @@ import org.seminario.customer.CustomerImpl;
 import org.seminario.item.Item;
 import org.seminario.item.ItemImpl;
 import org.seminario.relationships.RelationshipTypes;
+import org.seminario.salesman.Salesman;
+import org.seminario.salesman.SalesmanImpl;
 
 public class OrderImpl implements Order {
 
 	private final Node underlyingNode;
 	private static final String ORDER_NUMBER = "orderNumber";
+	private static final String ICON = "order";
 
 	public OrderImpl(Node underlyingNode) {
 		this.underlyingNode = underlyingNode;
+		this.underlyingNode.setProperty(ICON, ICON);
 	}
 
 	@Override
@@ -77,6 +81,23 @@ public class OrderImpl implements Order {
 		}
 
 		return itemCollection;
+	}
+
+	@Override
+	public Salesman getSalesman() {
+		Node salesmanNode = underlyingNode.getSingleRelationship(
+				RelationshipTypes.ORDER_TO_SALESMAN, Direction.OUTGOING)
+				.getEndNode();
+
+		return new SalesmanImpl(salesmanNode);
+	}
+
+	@Override
+	public void setSalesman(Salesman salesman) {
+		Node salesmanNode = ((SalesmanImpl) salesman).getUnderlyingNode();
+		getUnderlyingNode().createRelationshipTo(salesmanNode,
+				RelationshipTypes.ORDER_TO_SALESMAN);
+
 	}
 
 }
