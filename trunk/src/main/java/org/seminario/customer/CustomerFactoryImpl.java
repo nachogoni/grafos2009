@@ -15,7 +15,8 @@ public class CustomerFactoryImpl implements CustomerFactory {
 
 	private final NeoService neo;
 	private final Node customerFactoryNode;
-
+	private final String KEY_NAME = "name";
+	
 	public CustomerFactoryImpl(NeoService neo) {
 		this.neo = neo;
 
@@ -23,6 +24,7 @@ public class CustomerFactoryImpl implements CustomerFactory {
 				RelationshipTypes.CUSTOMERS, Direction.OUTGOING);
 		if (rel == null) {
 			customerFactoryNode = neo.createNode();
+			customerFactoryNode.setProperty(KEY_NAME, "Customers");
 			neo.getReferenceNode().createRelationshipTo(customerFactoryNode,
 					RelationshipTypes.CUSTOMERS);
 		} else {

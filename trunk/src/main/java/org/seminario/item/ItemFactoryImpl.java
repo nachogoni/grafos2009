@@ -10,14 +10,17 @@ public class ItemFactoryImpl implements ItemFactory {
 
 	private final NeoService neo;
 	private final Node itemFactoryNode;
+	private final String KEY_NAME = "name";
 
 	public ItemFactoryImpl(NeoService neo) {
 		this.neo = neo;
 
 		Relationship rel = neo.getReferenceNode().getSingleRelationship(
 				RelationshipTypes.ITEMS, Direction.OUTGOING);
+		
 		if (rel == null) {
 			itemFactoryNode = neo.createNode();
+			itemFactoryNode.setProperty(KEY_NAME, "Items");
 			neo.getReferenceNode().createRelationshipTo(itemFactoryNode,
 					RelationshipTypes.ITEMS);
 		} else {

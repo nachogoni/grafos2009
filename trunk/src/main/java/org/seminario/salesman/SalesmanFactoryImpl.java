@@ -10,6 +10,7 @@ public class SalesmanFactoryImpl implements SalesmanFactory {
 
 	private final NeoService neo;
 	private final Node salesmanFactoryNode;
+	private final String KEY_NAME = "name";
 
 	public SalesmanFactoryImpl(NeoService neo) {
 		this.neo = neo;
@@ -18,6 +19,7 @@ public class SalesmanFactoryImpl implements SalesmanFactory {
 				RelationshipTypes.SALESMAN, Direction.OUTGOING);
 		if (rel == null) {
 			salesmanFactoryNode = neo.createNode();
+			salesmanFactoryNode.setProperty(KEY_NAME, "Salesmans");
 			neo.getReferenceNode().createRelationshipTo(salesmanFactoryNode,
 					RelationshipTypes.SALESMAN);
 		} else {
