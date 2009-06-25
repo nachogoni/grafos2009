@@ -24,59 +24,66 @@ public class Seminario {
 	public static void main(String[] args) {
 
 		NeoService neo = new EmbeddedNeo("db/seminario");
-		Transaction tx = neo.beginTx();
+		Transaction tx = null;
 		Customer aCustomer = null;
 		Order anOrder = null;
 		Long start, end;
-
-		try {
-			start = System.currentTimeMillis();
-			//Normal for plugin demo.
-//			createCustomers(neo);
-//			Big for benchmarks!
-			createLotsOfCustomers(neo);
-
-			end = System.currentTimeMillis();
-			System.out.println("La db se creó en " + (end - start) + " ms.");
-
-			start = System.currentTimeMillis();
-			CustomerFactory customerFactory = new CustomerFactoryImpl(neo);
-
-			Iterator<Customer> iter = customerFactory.getAll();
-			while (iter.hasNext()) {
-				aCustomer = iter.next();
-
-//				System.out.println("Nombre: " + aCustomer.getFirstName());
-				Iterator<Order> orderIter = aCustomer.getAllOrders();
-				while (orderIter.hasNext()) {
-					anOrder = orderIter.next();
-					String ret = null;
-					ret = String.format("Order: %d\nSalesman: %s\n Items:\n",
-							anOrder.getOrderNumber(), anOrder.getSalesman()
-									.getFirstName());
-
-					for (Item item : anOrder.getItems()) {
-						ret += String.format("%s ________ %d\n",
-								item.getName(), item.getPrice());
+		
+		for(int n = 1000 ; n < 8000 ; n+=1000) {
+			
+			tx = neo.beginTx();
+			try {
+				start = System.currentTimeMillis();
+				//Normal for plugin demo.
+	//			createCustomers(neo);
+	//			Big for benchmarks!
+				createLotsOfCustomers(neo, n);
+	
+				end = System.currentTimeMillis();
+				System.out.println("La db se creó en " + (end - start) + " ms.");
+				System.out.println(n);
+				tx.success();
+			} finally {
+				tx.finish();
+			}
+			
+			tx = neo.beginTx();
+			try {
+				start = System.currentTimeMillis();
+				CustomerFactory customerFactory = new CustomerFactoryImpl(neo);
+	
+				Iterator<Customer> iter = customerFactory.getAll();
+				while (iter.hasNext()) {
+					aCustomer = iter.next();
+	
+					Iterator<Order> orderIter = aCustomer.getAllOrders();
+					while (orderIter.hasNext()) {
+						anOrder = orderIter.next();
+						String ret = null;
+						ret = String.format("Order: %d\nSalesman: %s\n Items:\n",
+								anOrder.getOrderNumber(), anOrder.getSalesman()
+										.getFirstName());
+	
+						for (Item item : anOrder.getItems()) {
+							ret += String.format("%s ________ %d\n",
+									item.getName(), item.getPrice());
+						}
 					}
-
-//					System.out.println(ret);
 				}
-
+	
+				tx.success();
+	
+			} finally {
+				tx.finish();
 			}
 
-			tx.success();
-
-		} finally {
-			tx.finish();
+			end = System.currentTimeMillis();
+			System.out.println("La consulta se hizo en " + (end - start) + " ms.");
 		}
-
-		end = System.currentTimeMillis();
-		System.out.println("La consulta se hizo en " + (end - start) + " ms.");
 		neo.shutdown();
 	}
 
-	private static void createLotsOfCustomers(NeoService neo) {
+	private static void createLotsOfCustomers(NeoService neo, int n) {
 		String[] names = { "Charly", "Maxi", "Juani", "Laura" };
 		String[] movieNames = { "bambi", "aladdin", "toy story", "dumbo",
 				"rey leon" };
@@ -94,7 +101,7 @@ public class Seminario {
 		SalesmanFactory salesmanFactory = new SalesmanFactoryImpl(neo);
 
 //		1000 loops
-		for(int i = 0 ; i < 1000 ; i++) {
+		for(int i = 0 ; i < n ; i++) {
 			int j = 0;
 			for(String name : names) {
 				// Order is created.

@@ -43,58 +43,59 @@ public class RobertoCarlos {
 
 	public static void main(String[] args) {
 		// DB path
-		NeoService neo = new EmbeddedNeo("var/robertoCarlos");
+		NeoService neo = new EmbeddedNeo("var3/robertoCarlos");
 		RobertoCarlos rc = new RobertoCarlos();
 		Transaction tx = null;
 		Node robertoCarlos = null;
 
 		Random r = new Random();
-
-		start = System.currentTimeMillis();
-		tx = neo.beginTx();
-		try {
-			// Create Roberto Carlos
-			robertoCarlos = neo.createNode();
-			robertoCarlos.setProperty("nombre", "Roberto Carlos");
-
-			for (int i = 0; i < 10000; i++) {
-				Node aNode = neo.createNode();
-
-				int nombreIndex = r.nextInt(rc.getNombres().length);
-				aNode.setProperty("nombre", rc.getNombres()[nombreIndex] + i);
-
-				robertoCarlos.createRelationshipTo(aNode, Relaciones.AMIGOS);
+		for(int n = 1000 ; n < 60000; n+= 1000) {
+			cant = 0;
+			start = System.currentTimeMillis();
+			tx = neo.beginTx();
+			try {
+				// Create Roberto Carlos
+				robertoCarlos = neo.createNode();
+				robertoCarlos.setProperty("nombre", "Roberto Carlos");
+	
+				for (int i = 0; i < n; i++) {
+					Node aNode = neo.createNode();
+	
+					int nombreIndex = r.nextInt(rc.getNombres().length);
+					aNode.setProperty("nombre", rc.getNombres()[nombreIndex] + i);
+	
+					robertoCarlos.createRelationshipTo(aNode, Relaciones.AMIGOS);
+				}
+				tx.success();
+			} finally {
+				tx.finish();
 			}
-			tx.success();
-		} finally {
-			tx.finish();
-		}
-
-		end = System.currentTimeMillis();
-		System.out.println("La db se creó en " + (end - start) + " ms.");
-
-		start = System.currentTimeMillis();
-		tx = neo.beginTx();
-		try {
-			Iterator<Relationship> iter = robertoCarlos.getRelationships(
-					Relaciones.AMIGOS).iterator();
-
-			while (iter.hasNext()) {
-				iter.next();
-				cant++;
+	
+			end = System.currentTimeMillis();
+			System.out.println("La db se creó en " + (end - start) + " ms.");
+	
+			start = System.currentTimeMillis();
+			tx = neo.beginTx();
+			try {
+				Iterator<Relationship> iter = robertoCarlos.getRelationships(
+						Relaciones.AMIGOS).iterator();
+	
+				while (iter.hasNext()) {
+					iter.next();
+					cant++;
+				}
+				tx.success();
+	
+			} finally {
+				tx.finish();
 			}
-			tx.success();
-
-		} finally {
-			tx.finish();
+	
+			System.out.println("Cantidad de amigos " + cant);
+			end = System.currentTimeMillis();
+	
+			System.out.println("La consulta se hizo en " + (end - start) + " ms.");
 		}
-
-		System.out.println("Cantidad de amigos " + cant);
-		end = System.currentTimeMillis();
-
-		System.out.println("La consulta se hizo en " + (end - start) + " ms.");
-
+		
 		neo.shutdown();
-
 	}
 }
