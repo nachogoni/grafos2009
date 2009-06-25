@@ -13,7 +13,7 @@ def main():
 
     print 'use video;'
 
-    for i in range(10000):
+    for i in range(8000):
         j = 0
 
         for name in names:
